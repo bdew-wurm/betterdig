@@ -44,7 +44,7 @@ public class BetterDigHooks {
             // If not found, and if it's enabled - look in crates
             if (result == null && BetterDigMod.levelFromCrates) {
                 ItemTemplate template = ItemTemplateFactory.getInstance().getTemplate(templateId);
-                for (Item container : vehicle.getAllItems(false)) {
+                for (Item container : vehicle.getAllItems(true)) {
                     if (container.isCrate()) {
                         for (Item bulkItem : container.getItems()) {
                             if (bulkItem.getRealTemplateId() == templateId && bulkItem.getBulkNumsFloat(false) >= 1f) {
