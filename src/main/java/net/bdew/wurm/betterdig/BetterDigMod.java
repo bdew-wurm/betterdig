@@ -1,22 +1,26 @@
 package net.bdew.wurm.betterdig;
 
+import com.wurmonline.server.behaviours.Actions;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import org.gotti.wurmunlimited.modloader.classhooks.HookManager;
-import org.gotti.wurmunlimited.modloader.interfaces.Configurable;
-import org.gotti.wurmunlimited.modloader.interfaces.Initable;
-import org.gotti.wurmunlimited.modloader.interfaces.PreInitable;
-import org.gotti.wurmunlimited.modloader.interfaces.WurmMod;
+import org.gotti.wurmunlimited.modloader.interfaces.*;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurable {
+public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurable, ServerStartedListener {
     private static final Logger logger = Logger.getLogger("BetterDigMod");
+
+    public static Set<Short> allowWhenMountedIds = new HashSet<>();
+    private String allowWhenMounted = "";
 
     static int overrideClayWeight = 20;
     static boolean digToVehicle = true;
@@ -58,6 +62,9 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
         levelFromDragged = Boolean.parseBoolean(properties.getProperty("levelFromDragged", "false"));
         levelFromCrates = Boolean.parseBoolean(properties.getProperty("levelFromCrates", "false"));
         levelFromGround = Boolean.parseBoolean(properties.getProperty("levelFromGround", "false"));
+
+        allowWhenMounted = properties.getProperty("allowWhenMounted", "");
+
         logInfo("overrideClayWeight = " + overrideClayWeight);
         logInfo("digToVehicle = " + digToVehicle);
         logInfo("dredgeToShip = " + dredgeToShip);
@@ -69,6 +76,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
         logInfo("levelFromDragged = " + levelFromDragged);
         logInfo("levelFromCrates = " + levelFromCrates);
         logInfo("levelFromGround = " + levelFromGround);
+        logInfo("allowWhenMounted = " + allowWhenMounted);
     }
 
     @Override
@@ -138,9 +146,40 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
                 }
             });
 
+            ExprEditor actionMountedFixer = new ExprEditor() {
+                @Override
+                public void edit(MethodCall m) throws CannotCompileException {
+                    if ("getVehicle".equals(m.getMethodName())) {
+                        m.replace("$_ = net.bdew.wurm.betterdig.BetterDigMod.allowWhenMountedIds.contains(new Short(action)) ? -10 : $proceed($$);");
+                        logInfo("Patched getVehicle check in Action constructor line " + m.getLineNumber());
+                    }
+                }
+            };
+
+            CtClass ctAction = classPool.getCtClass("com.wurmonline.server.behaviours.Action");
+            for (CtConstructor c : ctAction.getConstructors()) {
+                c.instrument(actionMountedFixer);
+            }
+
+
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
+    @Override
+    public void onServerStarted() {
+        if (allowWhenMounted.length() > 0) {
+            for (String actionName : allowWhenMounted.split(",")) {
+                actionName = actionName.trim().toUpperCase();
+                try {
+                    Short actionNum = Actions.class.getField(actionName).getShort(null);
+                    logInfo(String.format("Adding action allowed when mounted: %s (%d)", actionName, actionNum));
+                    allowWhenMountedIds.add(actionNum);
+                } catch (IllegalAccessException | NoSuchFieldException e) {
+                    logException("Error location action named " + actionName, e);
+                }
+            }
+        }
+    }
 }
