@@ -17,7 +17,7 @@ public class BetterDigHooks {
     public static boolean insertItemIntoVehicle(Item item, Item vehicle, Creature performer) {
         // If can put into crates, try that
         if (BetterDigMod.digToCrates && item.getTemplate().isBulk()) {
-            for (Item container : vehicle.getAllItems(false)) {
+            for (Item container : vehicle.getAllItems(true)) {
                 if (container.isCrate() && container.canAddToCrate(item)) {
                     if (item.AddBulkItemToCrate(performer, container)) {
                         performer.getCommunicator().sendNormalServerMessage(String.format("You put the %s in the %s in your %s.", item.getName(), container.getName(), vehicle.getName()));
