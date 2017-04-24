@@ -119,7 +119,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
 
             CtClass ctFlattening = classPool.getCtClass("com.wurmonline.server.behaviours.Flattening");
 
-            ctFlattening.getMethod("getDirt", "(Lcom/wurmonline/server/creatures/Creature;IIIIZ)V").instrument(new ExprEditor() {
+            ctFlattening.getMethod("getDirt", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIIZ)V").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "insertItem".equals(m.getMethodName())) {
@@ -145,7 +145,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
                 }
             });
 
-            ctFlattening.getMethod("checkUseDirt", "(IIIILcom/wurmonline/server/creatures/Creature;IILcom/wurmonline/server/behaviours/Action;Z)V").instrument(new ExprEditor() {
+            ctFlattening.getMethod("checkUseDirt", "(IIIILcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IILcom/wurmonline/server/behaviours/Action;Z)V").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.creatures.Creature".equals(m.getClassName()) && "getCarriedItem".equals(m.getMethodName())) {
