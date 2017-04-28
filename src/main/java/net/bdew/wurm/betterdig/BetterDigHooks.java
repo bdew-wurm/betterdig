@@ -82,9 +82,22 @@ public class BetterDigHooks {
         try {
             if (dirtItemTemplates.contains(item.getTemplateId())) {
                 // Is something that we are supposed to handle
+
                 if (item.getTemplateId() == ItemList.clay && BetterDigMod.overrideClayWeight > 0) {
                     // If enabled, make clay dig more weight
                     item.setWeight(BetterDigMod.overrideClayWeight * 1000, false);
+                }
+
+                if (item.getTemplateId() == ItemList.moss && BetterDigMod.overrideMossWeight > 0) {
+                    item.setWeight(BetterDigMod.overrideMossWeight * 1000, false);
+                }
+
+                if (item.getTemplateId() == ItemList.peat && BetterDigMod.overridePeatWeight > 0) {
+                    item.setWeight(BetterDigMod.overridePeatWeight * 1000, false);
+                }
+
+                if (item.getTemplateId() == ItemList.tar && BetterDigMod.overrideTarWeight > 0) {
+                    item.setWeight(BetterDigMod.overrideTarWeight * 1000, false);
                 }
 
                 // Check if on a vehicle

@@ -23,6 +23,9 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
     private String allowWhenMounted = "";
 
     static int overrideClayWeight = 20;
+    static int overrideMossWeight = 20;
+    static int overridePeatWeight = 20;
+    static int overrideTarWeight = 20;
     static boolean digToVehicle = true;
     static boolean dredgeToShip = true;
     static boolean levelToVehicle = true;
@@ -52,6 +55,9 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
     @Override
     public void configure(Properties properties) {
         overrideClayWeight = Integer.parseInt(properties.getProperty("overrideClayWeight", "-1"), 10);
+        overrideTarWeight = Integer.parseInt(properties.getProperty("overrideTarWeight", "-1"), 10);
+        overridePeatWeight = Integer.parseInt(properties.getProperty("overridePeatWeight", "-1"), 10);
+        overrideMossWeight = Integer.parseInt(properties.getProperty("overrideMossWeight", "-1"), 10);
         digToVehicle = Boolean.parseBoolean(properties.getProperty("digToVehicle", "false"));
         dredgeToShip = Boolean.parseBoolean(properties.getProperty("dredgeToShip", "false"));
         levelToVehicle = Boolean.parseBoolean(properties.getProperty("levelToVehicle", "false"));
@@ -66,6 +72,9 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
         allowWhenMounted = properties.getProperty("allowWhenMounted", "");
 
         logInfo("overrideClayWeight = " + overrideClayWeight);
+        logInfo("overrideTarWeight = " + overrideTarWeight);
+        logInfo("overridePeatWeight = " + overridePeatWeight);
+        logInfo("overrideMossWeight = " + overrideMossWeight);
         logInfo("digToVehicle = " + digToVehicle);
         logInfo("dredgeToShip = " + dredgeToShip);
         logInfo("levelToVehicle = " + levelToVehicle);
