@@ -98,7 +98,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
         try {
             ClassPool classPool = HookManager.getInstance().getClassPool();
 
-            classPool.get("com.wurmonline.server.behaviours.Terraforming").getMethod("dig", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIFLcom/wurmonline/mesh/MeshIO;)Z").instrument(new ExprEditor() {
+            classPool.get("com.wurmonline.server.behaviours.Terraforming").getMethod("dig", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIFZLcom/wurmonline/mesh/MeshIO;)Z").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "insertItem".equals(m.getMethodName())) {
@@ -119,7 +119,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
 
             CtClass ctFlattening = classPool.getCtClass("com.wurmonline.server.behaviours.Flattening");
 
-            ctFlattening.getMethod("getDirt", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIIZ)V").instrument(new ExprEditor() {
+            ctFlattening.getMethod("getDirt", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIIZLcom/wurmonline/server/behaviours/Action;)V").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "insertItem".equals(m.getMethodName())) {
@@ -135,7 +135,7 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
                 }
             });
 
-            ctFlattening.getMethod("useDirt", "(Lcom/wurmonline/server/creatures/Creature;IIIIZ)V").instrument(new ExprEditor() {
+            ctFlattening.getMethod("useDirt", "(Lcom/wurmonline/server/creatures/Creature;IIIIZLcom/wurmonline/server/behaviours/Action;)V").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.creatures.Creature".equals(m.getClassName()) && "getCarriedItem".equals(m.getMethodName())) {
