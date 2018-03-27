@@ -1,14 +1,18 @@
 apply plugin: 'java'
 
 group "net.bdew.wurm"
-version "0.7"
+version "0.8-beta16"
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven { url "http://gotti.no-ip.org/maven/repository" }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'org.gotti.wurmunlimited:server-modlauncher:0.33'
+    compile 'org.gotti.wurmunlimited:common:2614745'
+    compile 'org.gotti.wurmunlimited:server:2614745'
 }
 
 jar {

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurable, ServerStartedListener {
+public class BetterDigMod implements WurmServerMod, Initable, PreInitable, Configurable, ServerStartedListener {
     private static final Logger logger = Logger.getLogger("BetterDigMod");
 
     public static Set<Short> allowWhenMountedIds = new HashSet<>();
@@ -98,20 +98,20 @@ public class BetterDigMod implements WurmMod, Initable, PreInitable, Configurabl
         try {
             ClassPool classPool = HookManager.getInstance().getClassPool();
 
-            classPool.get("com.wurmonline.server.behaviours.Terraforming").getMethod("dig", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIFZLcom/wurmonline/mesh/MeshIO;)Z").instrument(new ExprEditor() {
+            classPool.get("com.wurmonline.server.behaviours.Terraforming").getMethod("dig", "(Lcom/wurmonline/server/creatures/Creature;Lcom/wurmonline/server/items/Item;IIIFZLcom/wurmonline/mesh/MeshIO;Z)Z").instrument(new ExprEditor() {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "insertItem".equals(m.getMethodName())) {
-                        m.replace("$_ = net.bdew.wurm.betterdig.BetterDigHooks.insertItemHook($1, $0, performer, dredging, false);");
+                        m.replace("if (!toPile) $_ = net.bdew.wurm.betterdig.BetterDigHooks.insertItemHook($1, $0, performer, dredging, false); else $_ = $proceed($$);");
                         logInfo("Installed insertItem dig hook at line " + m.getLineNumber());
                     } else if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "getNumItemsNotCoins".equals(m.getMethodName())) {
-                        m.replace("$_ = 0;");
+                        m.replace("if (!toPile) $_ = 0; else $_ = $proceed($$);");
                         logInfo("Installed getNumItemsNotCoins digging override at line " + m.getLineNumber());
                     } else if ("com.wurmonline.server.creatures.Creature".equals(m.getClassName()) && "canCarry".equals(m.getMethodName())) {
-                        m.replace("$_ = true;");
+                        m.replace("if (!toPile) $_ = true; else $_ = $proceed($$);");
                         logInfo("Installed canCarry digging override at line " + m.getLineNumber());
                     } else if ("com.wurmonline.server.items.Item".equals(m.getClassName()) && "getFreeVolume".equals(m.getMethodName())) {
-                        m.replace("$_ = 1000;");
+                        m.replace("if (!toPile) $_ = 1000; else $_ = $proceed($$);");
                         logInfo("Installed getFreeVolume digging override at line " + m.getLineNumber());
                     }
                 }
