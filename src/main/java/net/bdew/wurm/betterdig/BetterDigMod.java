@@ -4,7 +4,6 @@ import com.wurmonline.server.behaviours.Actions;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import org.gotti.wurmunlimited.modloader.classhooks.HookManager;
@@ -155,22 +154,9 @@ public class BetterDigMod implements WurmServerMod, Initable, PreInitable, Confi
                 }
             });
 
-            ExprEditor actionMountedFixer = new ExprEditor() {
-                @Override
-                public void edit(MethodCall m) throws CannotCompileException {
-                    if ("getVehicle".equals(m.getMethodName())) {
-                        m.replace("$_ = net.bdew.wurm.betterdig.BetterDigMod.allowWhenMountedIds.contains(new Short(action)) ? -10 : $proceed($$);");
-                        logInfo("Patched getVehicle check in Action constructor line " + m.getLineNumber());
-                    }
-                }
-            };
-
-            CtClass ctAction = classPool.getCtClass("com.wurmonline.server.behaviours.Action");
-            for (CtConstructor c : ctAction.getConstructors()) {
-                c.instrument(actionMountedFixer);
-            }
-
-
+            CtClass ctActions = classPool.getCtClass("com.wurmonline.server.behaviours.Actions");
+            ctActions.getMethod("isActionAllowedOnVehicle", "(S)Z")
+                    .insertBefore("if (net.bdew.wurm.betterdig.BetterDigMod.allowWhenMountedIds.contains(new Short($1))) return true;");
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
